@@ -1,18 +1,86 @@
 <html>
 <head>
-    <title></title>
+    <title>Cursor Tag</title>
+    <style type="text/css">
+        body {
+            background: #000;
+        }
+
+        .cursor {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 5px;
+            background: #fff;
+        }
+    </style>
     <script src="/socket.io/socket.io.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
     <script>
+        var enable_logging = true;
+
+        function _log(){
+            if (enable_logging && window.console && window.console.log) {
+                window.console.log.apply(window.console, arguments);
+            }
+        }
+        function _error(){
+            if (enable_logging && window.console && window.console.error) {
+                window.console.error.apply(window.console, arguments);
+            }
+        }
+        function _debug(){
+            if (enable_logging && window.console && window.console.debug) {
+                window.console.debug.apply(window.console, arguments);
+            }
+        }
+    </script>
+    <script>
         var socket = io.connect(window.location.host);
 
-        socket.on('news', function (data) {
-            console.log(data);
-            socket.emit('my other event', { my: 'data' });
+        function cursor(id) {
+            var cursor = $('.cursor#' + id);
+
+            if (! cursor.length) {
+                cursor = $('<div/>').attr({
+                    "id": id,
+                    "class": "cursor"
+                });
+
+                cursor.appendTo('#canvas');
+            }
+
+            return cursor;
+        }
+
+        $(function(){
+            var local_mouse_position = { x: -1, y: -1 };
+
+            $(document).mousemove(function(event) {
+                local_mouse_position.x = event.pageX;
+                local_mouse_position.y = event.pageY;
+            });
+
+            // TODO: only emit if position changed
+            setInterval(function(){
+                socket.emit('cursor_position', local_mouse_position);
+            }, 50);
+
+            socket.on('cursor_position', function(data){
+                cursor(data.client_id).css({
+                    top: data.position.y,
+                    left: data.position.x
+                });
+            });
+
+            socket.on('cursor_disconnect', function(data){
+                cursor(data.client_id).remove();
+            });
         });
     </script>
 </head>
 <body>
-
+    <div id="canvas"></div>
 </body>
 </html>

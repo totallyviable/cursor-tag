@@ -12,8 +12,16 @@ console.log('==================================================');
 app.use(express.static(__dirname + '/public'));
 
 io.on('connection', function (socket){
-    socket.emit('news', { hello: 'world' });
-    socket.on('my other event', function (data){
-        console.log(data);
+    socket.on('cursor_position', function(data){
+        socket.volatile.broadcast.emit('cursor_position', {
+            client_id: socket.id,
+            position: data
+        });
+    });
+
+    socket.on('disconnect', function (){
+        io.emit('cursor_disconnect', {
+            client_id: socket.id
+        });
     });
 });
