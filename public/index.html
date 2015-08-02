@@ -4,6 +4,19 @@
     <style type="text/css">
         body {
             background: #000;
+            color: #fff;
+        }
+
+        #stats {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 5px;
+        }
+
+        #stats .stat {
+            display: inline-block;
+            margin-right: 15px;
         }
 
         .cursor {
@@ -48,6 +61,8 @@
                     "class": "cursor"
                 });
 
+                cursor.data('client_id', id);
+
                 cursor.appendTo('#canvas');
             }
 
@@ -55,6 +70,10 @@
         }
 
         $(function(){
+            socket.on('player_count', function(data){
+                $("#player_count_number").text(data.count);
+            });
+
             var local_mouse_position = { x: -1, y: -1 };
 
             $(document).mousemove(function(event) {
@@ -65,7 +84,7 @@
             // TODO: only emit if position changed
             setInterval(function(){
                 socket.emit('cursor_position', local_mouse_position);
-            }, 50);
+            }, 15);
 
             socket.on('cursor_position', function(data){
                 cursor(data.client_id).css({
@@ -74,13 +93,42 @@
                 });
             });
 
+            socket.on('cursor_tagged', function(data){
+                $("#tags_received_number").text(
+                    parseInt($("#tags_received_number").text()) + 1
+                );
+            });
+
             socket.on('cursor_disconnect', function(data){
                 cursor(data.client_id).remove();
+            });
+
+            $("#canvas").on("click", ".cursor", function(e){
+                $("#tags_sent_number").text(
+                    parseInt($("#tags_sent_number").text()) + 1
+                );
+
+                socket.emit('cursor_click', {
+                    client_id: $(this).data('client_id')
+                });
             });
         });
     </script>
 </head>
 <body>
+    <div id="stats">
+        <div class="stat player_count">
+            <span id="player_count_number">0</span> players
+        </div>
+
+        <div class="stat tags_received">
+            <span id="tags_received_number">0</span> received
+        </div>
+
+        <div class="stat tags_sent">
+            <span id="tags_sent_number">0</span> sent
+        </div>
+    </div>
     <div id="canvas"></div>
 </body>
 </html>
