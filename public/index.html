@@ -5,7 +5,8 @@
         body {
             background: #000;
             color: #fff;
-            
+
+
             cursor: url('/arrow-white.png'), default;
 
             -webkit-touch-callout: none;
@@ -41,7 +42,7 @@
             overflow: hidden;
         }
 
-        .cursor {
+        #canvas .cursor {
             position: absolute;
             top: 0;
             left: 0;
@@ -49,6 +50,15 @@
             height: 19px;
             background: url('/arrow-black.png') top left no-repeat transparent;
             background-size: contain;
+        }
+
+        #splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            text-align: center;
         }
     </style>
     <script src="/socket.io/socket.io.js"></script>
@@ -93,6 +103,71 @@
         }
 
         $(function(){
+            var App = {
+                webcam: false,
+                webcam_is_enabled: false,
+
+                canvas: {
+                    el: false,
+                    ctx: false,
+                },
+
+                init: function(stream){
+                    if (window.location.hostname.indexOf('local') === -1 && window.location.protocol === 'http:') {
+                        window.location = window.location.href.replace('http:', 'https:');
+                        return;
+                    }
+                },
+
+                getUserMedia: function(options, success, error){
+                    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+                    return navigator.getUserMedia(options, success, error);
+                },
+
+                open_webcam: function(){
+                    App.getUserMedia({ video: true }, App.start_webcam, App.webcam_error);
+                },
+
+                webcam_error: function(err){
+                    _error('webcam error: ' + err);
+                },
+
+                webcam_success: function(){
+                    _debug('webcam success');
+                },
+
+                start_webcam: function(stream){
+                    App.webcam = $('<video/>').attr({
+                        autoplay: true,
+                        src: (window.URL || window.webkitURL).createObjectURL(stream),
+                    });
+
+                    App.canvas.el = $('<canvas/>').css({
+                        width: App.webcam.width(),
+                        height: App.webcam.height(),
+                    });
+
+                    App.webcam = App.webcam.get(0);
+                    App.canvas.el = App.canvas.el.get(0);
+
+                    App.canvas.ctx = App.canvas.el.getContext('2d');
+
+                    App.webcam_is_enabled = true;
+
+                    App.webcam_success();
+                },
+
+                capture_webcam_frame: function(callback){
+                    if (! App.webcam_is_enabled) return false;
+
+                    App.canvas.ctx.drawImage(App.webcam, 0, 0, App.canvas.el.width, App.canvas.el.height);
+
+                    callback(App.canvas.el.toDataURL('image/png'));
+                },
+            };
+
+            App.init();
+
             socket.on('player_count', function(data){
                 $("#player_count_number").text(data.count);
 
@@ -110,10 +185,12 @@
                 local_mouse_position.y = event.pageY;
             });
 
-            // TODO: only emit if position changed
-            setInterval(function(){
-                socket.emit('cursor_position', local_mouse_position);
-            }, 15);
+            function emit_mouse_position(){
+                // TODO: only emit if position changed
+                setInterval(function(){
+                    socket.emit('cursor_position', local_mouse_position);
+                }, 15);
+            }
 
             socket.on('cursor_position', function(data){
                 cursor(data.client_id).css({
@@ -126,6 +203,10 @@
                 $("#tags_received_number").text(
                     parseInt($("#tags_received_number").text()) + 1
                 );
+
+                App.capture_webcam_frame(function(frame){
+                    $("<img/>").attr("src", frame).appendTo("#canvas");
+                });
             });
 
             socket.on('cursor_disconnect', function(data){
@@ -140,6 +221,18 @@
                 socket.emit('cursor_click', {
                     client_id: $(this).data('client_id')
                 });
+            });
+
+            $("#enable_webcam").on("click", function(e){
+                App.webcam_success = function(){
+                    $("#splash").hide();
+                    $("#canvas, #stats .stat").removeClass("dimmed");
+                    emit_mouse_position();
+                }
+
+                App.open_webcam();
+
+                e.preventDefault();
             });
         });
     </script>
@@ -159,5 +252,11 @@
         </div>
     </div>
     <div id="canvas" class="dimmed"></div>
+    <div id="splash">
+        <div class="logo">Cursor Tag</div>
+        <div class="copy">
+            <a href="#" id="enable_webcam">Start</a>
+        </div>
+    </div>
 </body>
 </html>

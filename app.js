@@ -16,6 +16,7 @@ var clients = {};
 io.on('connection', function (socket){
     clients[socket.id] = socket;
 
+    // TODO: only count players with webcam enabled
     socket.emit('player_count', {
         count: Object.keys(clients).length
     });
