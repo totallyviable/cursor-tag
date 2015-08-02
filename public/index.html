@@ -6,6 +6,7 @@
             background: #000;
             color: #fff;
 
+
             cursor: url('/arrow-white.png'), default;
 
             -webkit-touch-callout: none;
@@ -20,12 +21,25 @@
             position: absolute;
             top: 0;
             left: 0;
-            padding: 5px;
+            padding: 10px;
         }
 
         #stats .stat {
             display: inline-block;
-            margin-right: 15px;
+            margin-right: 20px;
+        }
+
+        .stat.dimmed {
+            opacity: 0.3;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
         }
 
         .cursor {
@@ -82,6 +96,12 @@
         $(function(){
             socket.on('player_count', function(data){
                 $("#player_count_number").text(data.count);
+
+                if (data.count == 1) {
+                    $("#player_count_plural").hide();
+                } else {
+                    $("#player_count_plural").show();
+                }
             });
 
             var local_mouse_position = { x: -1, y: -1 };
@@ -128,14 +148,14 @@
 <body>
     <div id="stats">
         <div class="stat player_count">
-            <span id="player_count_number">0</span> players
+            <span id="player_count_number">1</span> player<span id="player_count_plural" style="display:none">s</span>
         </div>
 
-        <div class="stat tags_received">
+        <div class="stat dimmed tags_received">
             <span id="tags_received_number">0</span> received
         </div>
 
-        <div class="stat tags_sent">
+        <div class="stat dimmed tags_sent">
             <span id="tags_sent_number">0</span> sent
         </div>
     </div>
