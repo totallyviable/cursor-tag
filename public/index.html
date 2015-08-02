@@ -52,6 +52,14 @@
             background-size: contain;
         }
 
+        #photo {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 250px;
+            border: 1px solid #fff;
+        }
+
         #splash {
             position: fixed;
             top: 0;
@@ -199,14 +207,22 @@
                 });
             });
 
-            socket.on('cursor_tagged', function(data){
-                $("#tags_received_number").text(
-                    parseInt($("#tags_received_number").text()) + 1
+            socket.on('request_webcam_frame', function(data){
+                $("#tags_sent_number").text(
+                    parseInt($("#tags_sent_number").text()) + 1
                 );
 
                 App.capture_webcam_frame(function(frame){
-                    $("<img/>").attr("src", frame).appendTo("#canvas");
+                    socket.emit('send_webcam_frame', {
+                        victim_client_id: socket.id,
+                        opponent_client_id: data.opponent_client_id,
+                        frame: frame
+                    });
                 });
+            });
+
+            socket.on('receive_webcam_frame', function(data){
+                $("#photo").attr("src", data.frame).show();
             });
 
             socket.on('cursor_disconnect', function(data){
@@ -214,12 +230,12 @@
             });
 
             $("#canvas").on("click", ".cursor", function(e){
-                $("#tags_sent_number").text(
-                    parseInt($("#tags_sent_number").text()) + 1
+                $("#tags_received_number").text(
+                    parseInt($("#tags_received_number").text()) + 1
                 );
 
                 socket.emit('cursor_click', {
-                    client_id: $(this).data('client_id')
+                    victim_client_id: $(this).data('client_id')
                 });
             });
 
@@ -251,7 +267,9 @@
             <span id="tags_sent_number">0</span> sent
         </div>
     </div>
-    <div id="canvas" class="dimmed"></div>
+    <div id="canvas" class="dimmed">
+        <img id="photo" style="display:none">
+    </div>
     <div id="splash">
         <div class="logo">Cursor Tag</div>
         <div class="copy">

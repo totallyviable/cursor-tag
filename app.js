@@ -33,13 +33,22 @@ io.on('connection', function (socket){
     });
 
     socket.on('cursor_click', function(data){
-        var to_client = clients[data.client_id];
+        var victim_client = clients[data.victim_client_id];
 
-        if (! to_client) return;
+        if (! victim_client) return;
 
-        to_client.emit('cursor_tagged', {
-            from_client_id: socket.id
-        })
+        victim_client.emit('request_webcam_frame', {
+            victim_client_id: data.victim_client_id,
+            opponent_client_id: socket.id
+        });
+    });
+
+    socket.on('send_webcam_frame', function(data){
+        var opponent_client = clients[data.opponent_client_id];
+
+        if (! opponent_client) return;
+
+        opponent_client.emit('receive_webcam_frame', data);
     });
 
     socket.on('disconnect', function (){
