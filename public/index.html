@@ -5,6 +5,8 @@
         body {
             background: #000;
             color: #fff;
+
+            cursor: url('/arrow-white.png'), default;
         }
 
         #stats {
@@ -23,9 +25,10 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 5px;
-            height: 5px;
-            background: #fff;
+            width: 12px;
+            height: 19px;
+            background: url('/arrow-black.png') top left no-repeat transparent;
+            background-size: contain;
         }
     </style>
     <script src="/socket.io/socket.io.js"></script>
