@@ -31,6 +31,15 @@
 
         a {
             color: inherit;
+            text-decoration: none;
+        }
+
+        .green {
+            color: #00FF00;
+        }
+
+        .red {
+            color: #FF5685;
         }
 
         #stats {
@@ -85,6 +94,10 @@
             text-align: center;
             padding: 100px;
         }
+
+            #splash .logo {
+                font-size: 40px;
+            }
 
         #flash {
             position: fixed;
@@ -322,7 +335,7 @@
     <div id="splash">
         <div class="logo">Cursor Tag</div>
         <div class="copy">
-            <a href="#" id="enable_webcam">Start</a>
+            <a href="#" id="enable_webcam" class="green">Start</a>
         </div>
     </div>
     <div id="flash" style="display:none;"></div>
