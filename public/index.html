@@ -27,6 +27,8 @@
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+
+            -webkit-font-smoothing: subpixel-antialiased;
         }
 
         a {
@@ -85,7 +87,7 @@
             border: 1px solid #fff;
         }
 
-        #splash {
+        .splash {
             position: fixed;
             top: 0;
             left: 0;
@@ -95,9 +97,25 @@
             padding: 100px;
         }
 
-            #splash #logo {
-                font-size: 40px;
+            .splash .contents {
+                position: absolute;
+                top: 30%;
+                left: 0;
+                right: 0;
             }
+
+                .splash .contents #logo {
+                    font-size: 40px;
+                    margin-bottom: 100px;
+                }
+
+                .splash .contents .copy {
+                    margin-top: 80px;
+                    margin-left: auto;
+                    margin-right: auto;
+                    width: 50%;
+                    font-style: italic;
+                }
 
         #flash {
             position: fixed;
@@ -108,8 +126,26 @@
             background: #fff;
             opacity: 0.15;
         }
+
+        #countdown {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+            #countdown span {
+                position: absolute;
+                top: 45%;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 35px;
+            }
     </style>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/webcam.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
     <script>
         var enable_logging = true;
@@ -151,8 +187,14 @@
         }
 
         $(function(){
+            if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+                $("#splash-desktop").hide();
+                $("#splash-mobile").show();
+            }
+
             var App = {
                 flash_reset: null,
+                frame_reset: null,
 
                 webcam: false,
                 webcam_is_enabled: false,
@@ -169,13 +211,10 @@
                     }
                 },
 
-                getUserMedia: function(options, success, error){
-                    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-                    return navigator.getUserMedia(options, success, error);
-                },
-
                 open_webcam: function(){
-                    App.getUserMedia({ video: true }, App.start_webcam, App.webcam_error);
+                    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+                    return navigator.getUserMedia({ video: true }, App.start_webcam, App.webcam_error);
                 },
 
                 webcam_error: function(err){
@@ -189,7 +228,7 @@
                 start_webcam: function(stream){
                     App.webcam = $('<video/>').attr({
                         autoplay: true,
-                        src: (window.URL || window.webkitURL).createObjectURL(stream),
+                        src: (window.URL || window.webkitURL || window.mozURL || window.msURL).createObjectURL(stream),
                     });
 
                     App.canvas.el = $('<canvas/>').css({
@@ -285,6 +324,12 @@
             socket.on('receive_webcam_frame', function(data){
                 $("#photo").attr("src", data.frame).show();
                 App.play_sound('received');
+
+                window.clearTimeout(App.frame_reset);
+
+                App.frame_reset = window.setTimeout(function(){
+                    $("#photo").fadeOut();
+                }, 1000);
             });
 
             socket.on('cursor_disconnect', function(data){
@@ -303,21 +348,25 @@
 
             $("#enable_webcam").on("click", function(e){
                 App.webcam_success = function(){
+                    $("#splash-desktop").hide();
+                    $("#countdown").show();
+                    $("#stats .stat").removeClass("dimmed");
+
                     App.play_sound('countdown');
-                    $("#logo").text('3');
+                    $("#countdown span").text('3');
 
                     window.setTimeout(function(){
                         App.play_sound('countdown');
-                        $("#logo").text('2');
+                        $("#countdown span").text('2');
 
                         window.setTimeout(function(){
                             App.play_sound('countdown');
-                            $("#logo").text('1');
+                            $("#countdown span").text('1');
 
                             window.setTimeout(function(){
                                 App.play_sound('countdown-over');
-                                $("#splash").hide();
-                                $("#canvas, #stats .stat").removeClass("dimmed");
+                                $("#countdown").hide();
+                                $("#canvas").removeClass("dimmed");
                                 emit_mouse_position();
                             }, 1000);
                         }, 1000);
@@ -348,16 +397,40 @@
     <div id="canvas" class="dimmed">
         <img id="photo" style="display:none">
     </div>
-    <div id="splash">
-        <div id="logo">Cursor Tag</div>
-        <div class="copy">
-            <a href="#" id="enable_webcam" class="green">Start</a>
+    <div id="splash-desktop" class="splash">
+        <div class="contents">
+            <div id="logo">Cursor Tag</div>
+            <div class="copy">
+                <a href="#" id="enable_webcam" class="green">Start</a>
+            </div>
+            <div class="copy">
+                You must enable your camera to play this game
+                <br><br><br>
+                Tagging a player snaps a picture of the player.
+                <br>
+                Click on a players cursor to tag.
+            </div>
         </div>
+    </div>
+    <div id="splash-mobile" class="splash" style="display:none;">
+        <div class="contents">
+            <div id="logo">Cursor Tag</div>
+            <div class="copy">
+                <a href="mailto:?body=http://cursortag.com" class="green">Email yourself a link</a>
+            </div>
+            <div class="copy">
+                You can only cursor tag on a desktop.<br>
+                Phones don’t have cursors.
+            </div>
+        </div>
+    </div>
+    <div id="countdown" style="display:none;">
+        <span>3</span>
     </div>
     <div id="flash" style="display:none;"></div>
     <audio preload="auto" id="sound-countdown" src="/Pop.wav"></audio>
     <audio preload="auto" id="sound-countdown-over" src="/Hero.wav"></audio>
-    <audio preload="auto" id="sound-sent" src="/Ping.wav"></audio>
-    <audio preload="auto" id="sound-received" src="/Tink.wav"></audio>
+    <audio preload="auto" id="sound-sent" src="/shutter.mp3"></audio>
+    <audio preload="auto" id="sound-received" src="/laser.mp3"></audio>
 </body>
 </html>
