@@ -93,6 +93,7 @@
             right: 0;
             bottom: 0;
             background: #fff;
+            opacity: 0.15;
         }
     </style>
     <script src="/socket.io/socket.io.js"></script>
@@ -212,7 +213,9 @@
                 },
 
                 play_sound: function(type){
-                    $("#sound-" + type)[0].play();
+                    var audio = $("#sound-" + type)[0];
+                    audio.currentTime = 0;
+                    audio.play();
                 }
             };
 
