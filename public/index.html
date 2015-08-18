@@ -95,7 +95,7 @@
             padding: 100px;
         }
 
-            #splash .logo {
+            #splash #logo {
                 font-size: 40px;
             }
 
@@ -303,9 +303,25 @@
 
             $("#enable_webcam").on("click", function(e){
                 App.webcam_success = function(){
-                    $("#splash").hide();
-                    $("#canvas, #stats .stat").removeClass("dimmed");
-                    emit_mouse_position();
+                    App.play_sound('countdown');
+                    $("#logo").text('3');
+
+                    window.setTimeout(function(){
+                        App.play_sound('countdown');
+                        $("#logo").text('2');
+
+                        window.setTimeout(function(){
+                            App.play_sound('countdown');
+                            $("#logo").text('1');
+
+                            window.setTimeout(function(){
+                                App.play_sound('countdown-over');
+                                $("#splash").hide();
+                                $("#canvas, #stats .stat").removeClass("dimmed");
+                                emit_mouse_position();
+                            }, 1000);
+                        }, 1000);
+                    }, 1000);
                 }
 
                 App.open_webcam();
@@ -333,12 +349,14 @@
         <img id="photo" style="display:none">
     </div>
     <div id="splash">
-        <div class="logo">Cursor Tag</div>
+        <div id="logo">Cursor Tag</div>
         <div class="copy">
             <a href="#" id="enable_webcam" class="green">Start</a>
         </div>
     </div>
     <div id="flash" style="display:none;"></div>
+    <audio preload="auto" id="sound-countdown" src="/Pop.wav"></audio>
+    <audio preload="auto" id="sound-countdown-over" src="/Hero.wav"></audio>
     <audio preload="auto" id="sound-sent" src="/Ping.wav"></audio>
     <audio preload="auto" id="sound-received" src="/Tink.wav"></audio>
 </body>
