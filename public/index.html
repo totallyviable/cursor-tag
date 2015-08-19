@@ -143,6 +143,14 @@
                 text-align: center;
                 font-size: 35px;
             }
+
+        #camera_permissions {
+
+        }
+
+            #camera_feed {
+                margin: 0 auto;
+            }
     </style>
     <script src="//cdn.socket.io/socket.io-1.3.5.js"></script>
     <script src="/webcam.min.js"></script>
@@ -169,52 +177,51 @@
     <script>
         var socket = io.connect(window.location.host);
 
-        function cursor(id) {
-            var cursor = $('.cursor#' + id);
-
-            if (! cursor.length) {
-                cursor = $('<div/>').attr({
-                    "id": id,
-                    "class": "cursor"
-                });
-
-                cursor.data('client_id', id);
-
-                cursor.appendTo('#canvas');
-            }
-
-            return cursor;
-        }
-
         $(function(){
-            if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-                $("#splash-desktop").hide();
-                $("#splash-mobile").show();
-            }
-
             var App = {
                 flash_reset: null,
                 frame_reset: null,
-
-                webcam: false,
-                webcam_is_enabled: false,
-
-                canvas: {
-                    el: false,
-                    ctx: false,
-                },
 
                 init: function(stream){
                     if (window.location.hostname.indexOf('local') === -1 && window.location.protocol === 'http:') {
                         window.location = window.location.href.replace('http:', 'https:');
                         return;
                     }
+
+                    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                        $("#splash-desktop").hide();
+                        $("#splash-mobile").show();
+                    }
+
+                    Webcam.set({
+                        width: 320,
+                        height: 240,
+                        jpeg_quality: 50
+                    });
+
+                    Webcam.on('live', App.webcam_success);
+                    Webcam.on('error', App.webcam_error);
+                },
+
+                cursor: function(id){
+                    var cursor = $('.cursor#' + id);
+
+                    if (! cursor.length) {
+                        cursor = $('<div/>').attr({
+                            "id": id,
+                            "class": "cursor"
+                        });
+
+                        cursor.data('client_id', id);
+
+                        cursor.appendTo('#canvas');
+                    }
+
+                    return cursor;
                 },
 
                 open_webcam: function(){
-                    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-
-                    return navigator.getUserMedia({ video: true }, App.start_webcam, App.webcam_error);
+                    Webcam.attach('#camera_feed');
                 },
 
                 webcam_error: function(err){
@@ -222,36 +229,41 @@
                 },
 
                 webcam_success: function(){
-                    _debug('webcam success');
-                },
-
-                start_webcam: function(stream){
-                    App.webcam = $('<video/>').attr({
-                        autoplay: true,
-                        src: (window.URL || window.webkitURL || window.mozURL || window.msURL).createObjectURL(stream),
+                    $("#camera_permissions").css({
+                        "opacity": "0",
+                        "zIndex": "-999"
                     });
+                    
+                    $("#countdown").show();
+                    $("#stats .stat").removeClass("dimmed");
 
-                    App.canvas.el = $('<canvas/>').css({
-                        width: App.webcam.width(),
-                        height: App.webcam.height(),
-                    });
+                    App.play_sound('countdown');
+                    $("#countdown span").text('3');
 
-                    App.webcam = App.webcam.get(0);
-                    App.canvas.el = App.canvas.el.get(0);
+                    window.setTimeout(function(){
+                        App.play_sound('countdown');
+                        $("#countdown span").text('2');
 
-                    App.canvas.ctx = App.canvas.el.getContext('2d');
+                        window.setTimeout(function(){
+                            App.play_sound('countdown');
+                            $("#countdown span").text('1');
 
-                    App.webcam_is_enabled = true;
+                            window.setTimeout(function(){
+                                App.play_sound('countdown-over');
+                                $("#countdown").hide();
+                                $("#canvas").removeClass("dimmed");
+                                emit_mouse_position();
 
-                    App.webcam_success();
+                                ga('send', 'event', 'webcam', 'enabled');
+                            }, 1000);
+                        }, 1000);
+                    }, 1000);
                 },
 
                 capture_webcam_frame: function(callback){
-                    if (! App.webcam_is_enabled) return false;
+                    // if (! App.webcam_is_enabled) return false;
 
-                    App.canvas.ctx.drawImage(App.webcam, 0, 0, App.canvas.el.width, App.canvas.el.height);
-
-                    callback(App.canvas.el.toDataURL('image/jpeg'));
+                    Webcam.snap(callback);
                 },
 
                 flash_screen: function(){
@@ -298,7 +310,7 @@
             }
 
             socket.on('cursor_position', function(data){
-                cursor(data.client_id).css({
+                App.cursor(data.client_id).css({
                     top: data.position.y,
                     left: data.position.x
                 });
@@ -337,7 +349,7 @@
             });
 
             socket.on('cursor_disconnect', function(data){
-                cursor(data.client_id).remove();
+                App.cursor(data.client_id).remove();
             });
 
             $("#canvas").on("click", ".cursor", function(e){
@@ -351,33 +363,8 @@
             });
 
             $("#enable_webcam").on("click", function(e){
-                App.webcam_success = function(){
-                    $("#splash-desktop").hide();
-                    $("#countdown").show();
-                    $("#stats .stat").removeClass("dimmed");
-
-                    App.play_sound('countdown');
-                    $("#countdown span").text('3');
-
-                    window.setTimeout(function(){
-                        App.play_sound('countdown');
-                        $("#countdown span").text('2');
-
-                        window.setTimeout(function(){
-                            App.play_sound('countdown');
-                            $("#countdown span").text('1');
-
-                            window.setTimeout(function(){
-                                App.play_sound('countdown-over');
-                                $("#countdown").hide();
-                                $("#canvas").removeClass("dimmed");
-                                emit_mouse_position();
-
-                                ga('send', 'event', 'webcam', 'enabled');
-                            }, 1000);
-                        }, 1000);
-                    }, 1000);
-                }
+                $("#splash-desktop").hide();
+                $("#camera_permissions").show();
 
                 App.open_webcam();
 
@@ -441,6 +428,9 @@
     </div>
     <div id="countdown" style="display:none;">
         <span>3</span>
+    </div>
+    <div id="camera_permissions" class="splash" style="display:none;">
+        <div id="camera_feed" class="contents"></div>
     </div>
     <div id="flash" style="display:none;"></div>
     <audio preload="auto" id="sound-countdown" src="/ping.mp3"></audio>
