@@ -175,7 +175,13 @@
         }
     </script>
     <script>
-        var socket = io.connect(window.location.host);
+        var websocket_host = "cursor-tag.herokuapp.com";
+
+        if (window.location.hostname.indexOf('local') !== -1) {
+            websocket_host = window.location.host;
+        }
+
+        var socket = io.connect(websocket_host);
 
         $(function(){
             var App = {
