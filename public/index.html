@@ -318,6 +318,8 @@
                         opponent_client_id: data.opponent_client_id,
                         frame: frame
                     });
+
+                    ga('send', 'event', 'frame', 'sent');
                 });
             });
 
@@ -330,6 +332,8 @@
                 App.frame_reset = window.setTimeout(function(){
                     $("#photo").fadeOut();
                 }, 1000);
+
+                ga('send', 'event', 'frame', 'received');
             });
 
             socket.on('cursor_disconnect', function(data){
@@ -368,6 +372,8 @@
                                 $("#countdown").hide();
                                 $("#canvas").removeClass("dimmed");
                                 emit_mouse_position();
+
+                                ga('send', 'event', 'webcam', 'enabled');
                             }, 1000);
                         }, 1000);
                     }, 1000);
