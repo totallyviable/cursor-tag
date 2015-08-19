@@ -326,10 +326,6 @@
             });
 
             socket.on('request_webcam_frame', function(data){
-                $("#tags_sent_number").text(
-                    parseInt($("#tags_sent_number").text()) + 1
-                );
-
                 App.capture_webcam_frame(function(frame){
                     App.flash_screen();
                     App.play_sound('sent');
@@ -340,11 +336,19 @@
                         frame: frame
                     });
 
+                    $("#tags_sent_number").text(
+                        parseInt($("#tags_sent_number").text()) + 1
+                    );
+
                     ga('send', 'event', 'frame', 'sent');
                 });
             });
 
             socket.on('receive_webcam_frame', function(data){
+                $("#tags_received_number").text(
+                    parseInt($("#tags_received_number").text()) + 1
+                );
+
                 $("#photo").attr("src", data.frame).show();
                 App.play_sound('received');
 
@@ -362,10 +366,6 @@
             });
 
             $("#canvas").on("click", ".cursor", function(e){
-                $("#tags_received_number").text(
-                    parseInt($("#tags_received_number").text()) + 1
-                );
-
                 socket.emit('cursor_click', {
                     victim_client_id: $(this).data('client_id')
                 });
@@ -398,11 +398,11 @@
         </div>
 
         <div class="stat dimmed tags_received">
-            <span id="tags_received_number">0</span> received
+            <span id="tags_received_number">0</span> captured
         </div>
 
         <div class="stat dimmed tags_sent">
-            <span id="tags_sent_number">0</span> sent
+            <span id="tags_sent_number">0</span> caught
         </div>
     </div>
     <div id="canvas" class="dimmed">
