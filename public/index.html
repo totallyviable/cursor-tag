@@ -167,7 +167,9 @@
         }
     </script>
     <script>
-        var socket = io.connect(window.location.host);
+        var socket = io.connect(window.location.host, {
+            transports: ['websocket']
+        });
 
         function cursor(id) {
             var cursor = $('.cursor#' + id);
