@@ -196,6 +196,9 @@
                     Webcam.set({
                         width: 320,
                         height: 240,
+                        crop_width: 320,
+                        crop_height: 240,
+
                         jpeg_quality: 50
                     });
 
@@ -233,7 +236,7 @@
                         "opacity": "0",
                         "zIndex": "-999"
                     });
-                    
+
                     $("#countdown").show();
                     $("#stats .stat").removeClass("dimmed");
 
