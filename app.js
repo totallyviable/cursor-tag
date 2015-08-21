@@ -3,9 +3,6 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
-io.set('transports', ['websocket', 'xhr-polling', 'jsonp-polling', 'polling']);
-io.set("polling duration", 10); 
-
 server.listen(process.env.PORT);
 
 console.log('==================================================');
