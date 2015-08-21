@@ -11,21 +11,18 @@ console.log('==================================================');
 
 app.use(express.static(__dirname + '/public'));
 
-var clients = {};
-var active_client_count = 0;
+var active_clients = {};
 
 io.on('connection', function (socket){
-    clients[socket.id] = socket;
-
     socket.on('activate_webcam', function(data){
-        active_client_count++;
+        active_clients[socket.id] = socket;
 
         socket.emit('player_count', {
-            count: active_client_count
+            count: Object.keys(active_clients).length
         });
 
         socket.broadcast.emit('player_count', {
-            count: active_client_count
+            count: Object.keys(active_clients).length
         });
     });
 
@@ -37,7 +34,7 @@ io.on('connection', function (socket){
     });
 
     socket.on('cursor_click', function(data){
-        var victim_client = clients[data.victim_client_id];
+        var victim_client = active_clients[data.victim_client_id];
 
         if (! victim_client) return;
 
@@ -48,7 +45,7 @@ io.on('connection', function (socket){
     });
 
     socket.on('send_webcam_frame', function(data){
-        var opponent_client = clients[data.opponent_client_id];
+        var opponent_client = active_clients[data.opponent_client_id];
 
         if (! opponent_client) return;
 
@@ -60,12 +57,12 @@ io.on('connection', function (socket){
             client_id: socket.id
         });
 
-        delete clients[socket.id];
-        active_client_count--;
-        if (active_client_count < 0) active_client_count = 0;
+        if (active_clients[socket.id]) {
+            delete active_clients[socket.id];
 
-        socket.broadcast.emit('player_count', {
-            count: active_client_count
-        });
+            socket.broadcast.emit('player_count', {
+                count: Object.keys(active_clients).length
+            });
+        }
     });
 });
