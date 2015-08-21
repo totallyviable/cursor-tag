@@ -15,17 +15,21 @@ console.log('==================================================');
 app.use(express.static(__dirname + '/public'));
 
 var clients = {};
+var active_client_count = 0;
 
 io.on('connection', function (socket){
     clients[socket.id] = socket;
 
-    // TODO: only count players with webcam enabled
-    socket.emit('player_count', {
-        count: Object.keys(clients).length
-    });
+    socket.on('activate_webcam', function(data){
+        active_client_count++;
 
-    socket.broadcast.emit('player_count', {
-        count: Object.keys(clients).length
+        socket.emit('player_count', {
+            count: active_client_count
+        });
+
+        socket.broadcast.emit('player_count', {
+            count: active_client_count
+        });
     });
 
     socket.on('cursor_position', function(data){
@@ -60,9 +64,11 @@ io.on('connection', function (socket){
         });
 
         delete clients[socket.id];
+        active_client_count--;
+        if (active_client_count < 0) active_client_count = 0;
 
         socket.broadcast.emit('player_count', {
-            count: Object.keys(clients).length
+            count: active_client_count
         });
     });
 });

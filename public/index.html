@@ -238,6 +238,8 @@
                 },
 
                 webcam_success: function(){
+                    socket.emit('activate_webcam', true);
+
                     $("#camera_permissions").css({
                         "opacity": "0",
                         "zIndex": "-999"
@@ -379,6 +381,11 @@
 
                 e.preventDefault();
             });
+
+            window.onbeforeunload = function(){
+                socket.disconnect();
+                _log('connected:', socket.disconnected);
+            };
         });
     </script>
     <script>
