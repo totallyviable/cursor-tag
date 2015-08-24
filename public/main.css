@@ -27,6 +27,15 @@ body {
     -webkit-font-smoothing: subpixel-antialiased;
 }
 
+.enable_user_select {
+    -webkit-touch-callout: default;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
 a {
     color: inherit;
     text-decoration: none;

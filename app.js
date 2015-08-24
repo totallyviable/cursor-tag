@@ -11,6 +11,10 @@ console.log('==================================================');
 
 app.use(express.static(__dirname + '/public'));
 
+app.get('/about', function (req, res){
+    res.sendFile(__dirname + '/public/about.html');
+});
+
 var active_clients = {};
 
 setInterval(function(){
