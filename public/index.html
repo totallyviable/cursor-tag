@@ -38,6 +38,7 @@
             var App = {
                 flash_reset: null,
                 frame_reset: null,
+                emit_mouse_position_interval: null,
 
                 init: function(stream){
                     if (window.location.hostname.indexOf('local') === -1 && window.location.protocol === 'http:') {
@@ -102,6 +103,17 @@
                     App.play_sound('countdown');
                     $("#countdown span").text('3');
 
+                    $(window).blur(function(){
+                        clearInterval(App.emit_mouse_position_interval);
+                        $("#paused").show();
+                    });
+
+                    $(window).focus(function(){
+                        $("#paused").hide();
+                        App.play_sound('countdown-over');
+                        emit_mouse_position();
+                    });
+
                     window.setTimeout(function(){
                         App.play_sound('countdown');
                         $("#countdown span").text('2');
@@ -163,8 +175,10 @@
             });
 
             function emit_mouse_position(){
+                clearInterval(App.emit_mouse_position);
+
                 // TODO: only emit if position changed
-                setInterval(function(){
+                App.emit_mouse_position_interval = setInterval(function(){
                     socket.emit('cursor_position', local_mouse_position);
                 }, 15);
             }
@@ -304,6 +318,9 @@
     </div>
     <div id="countdown" style="display:none;">
         <span>3</span>
+    </div>
+    <div id="paused" style="display:none;">
+        <span>PAUSED</span>
     </div>
     <div id="camera_permissions" class="splash" style="display:none;">
         <div id="camera_feed" class="contents"></div>
