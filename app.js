@@ -37,6 +37,7 @@ io.on('connection', function (socket){
 
         socket.volatile.broadcast.emit('cursor_position', {
             client_id: socket.id,
+            client_paused: socket.paused,
             position: data
         });
     });

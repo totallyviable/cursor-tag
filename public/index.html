@@ -184,6 +184,8 @@
             }
 
             socket.on('cursor_position', function(data){
+                if (data.client_paused) return;
+
                 App.cursor(data.client_id).css({
                     left: data.position[0],
                     top: data.position[1]
