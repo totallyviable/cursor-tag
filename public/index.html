@@ -272,8 +272,6 @@
                 },
 
                 capture_webcam_frame: function(callback){
-                    // if (! App.webcam_is_enabled) return false;
-
                     Webcam.snap(callback);
                 },
 
@@ -324,7 +322,7 @@
                 App.cursor(data.client_id).css({
                     top: data.position.y,
                     left: data.position.x
-                });
+                }).data('last-seen', Date.now());
             });
 
             socket.on('request_webcam_frame', function(data){
@@ -382,9 +380,20 @@
                 e.preventDefault();
             });
 
+            setInterval(function(){
+                var cutoff_time = Date.now() - 1200;
+
+                $(".cursor").each(function(){
+                    _log($(this).data('last-seen') - cutoff_time);
+
+                    if ($(this).data('last-seen') < cutoff_time) {
+                        $(this).remove();
+                    }
+                });
+            }, 500);
+
             window.onbeforeunload = function(){
                 socket.disconnect();
-                _log('connected:', socket.disconnected);
             };
         });
     </script>
