@@ -1,0 +1,161 @@
+@font-face {
+    font-family: Hyperspace;
+    src: url("/hyperspace.otf") format("opentype");
+}
+
+@font-face {
+    font-family: Hyperspace;
+    font-style: italic;
+    src: url("/hyperspace-italic.otf") format("opentype");
+}
+
+body {
+    background: #000;
+    color: #fff;
+    font: normal 14px Hyperspace, Helvetica, sans-serif;
+    letter-spacing: 2px;
+
+    cursor: url('/arrow-white.svg'), default;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    -webkit-font-smoothing: subpixel-antialiased;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.green {
+    color: #00FF00;
+}
+
+.red {
+    color: #FF5685;
+}
+
+.blue {
+    color: #6857FF;
+}
+
+#stats {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 10px;
+}
+
+#stats .stat {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+.dimmed {
+    opacity: 0.3;
+}
+
+#canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+}
+
+#canvas .cursor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 13px;
+    height: 20px;
+    background: url('/arrow-black.svg') top left no-repeat transparent;
+    background-size: contain;
+}
+
+#photo {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 250px;
+    border: 1px solid #fff;
+}
+
+.splash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    text-align: center;
+    padding: 100px;
+}
+
+    .splash .contents {
+        position: absolute;
+        top: 30%;
+        left: 0;
+        right: 0;
+    }
+
+        .splash .contents .logo {
+            font-size: 40px;
+            margin-bottom: 100px;
+        }
+
+        .splash .contents .copy {
+            margin-top: 80px;
+            margin-left: auto;
+            margin-right: auto;
+            width: 75%;
+            font-style: italic;
+        }
+
+    .splash .copyright {
+        position: absolute;
+        bottom: 10px;
+        left: 0;
+        right: 0;
+    }
+
+#flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    opacity: 0.15;
+}
+
+#countdown {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+    #countdown span {
+        position: absolute;
+        top: 45%;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 35px;
+    }
+
+#camera_permissions {
+
+}
+
+    #camera_feed {
+        margin: 0 auto;
+        background: #000 center center no-repeat url('/loading.gif');
+    }
