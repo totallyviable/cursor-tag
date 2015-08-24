@@ -304,11 +304,11 @@
                 }
             });
 
-            var local_mouse_position = { x: -1, y: -1 };
+            var local_mouse_position = [ -1, -1 ]; // x,y
 
-            $(document).mousemove(function(event) {
-                local_mouse_position.x = event.pageX;
-                local_mouse_position.y = event.pageY;
+            $(document).mousemove(function(event){
+                local_mouse_position[0] = event.pageX;
+                local_mouse_position[1] = event.pageY;
             });
 
             function emit_mouse_position(){
@@ -320,8 +320,8 @@
 
             socket.on('cursor_position', function(data){
                 App.cursor(data.client_id).css({
-                    top: data.position.y,
-                    left: data.position.x
+                    left: data.position[0],
+                    top: data.position[1]
                 }).data('last-seen', Date.now());
             });
 
