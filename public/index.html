@@ -104,14 +104,16 @@
                     $("#countdown span").text('3');
 
                     $(window).blur(function(){
-                        clearInterval(App.emit_mouse_position_interval);
                         $("#paused").show();
+                        
+                        socket.emit('paused', true);
                     });
 
                     $(window).focus(function(){
                         $("#paused").hide();
                         App.play_sound('countdown-over');
-                        emit_mouse_position();
+
+                        socket.emit('activate_webcam', true);
                     });
 
                     window.setTimeout(function(){
@@ -175,8 +177,6 @@
             });
 
             function emit_mouse_position(){
-                clearInterval(App.emit_mouse_position);
-
                 // TODO: only emit if position changed
                 App.emit_mouse_position_interval = setInterval(function(){
                     socket.emit('cursor_position', local_mouse_position);
@@ -227,7 +227,7 @@
             });
 
             socket.on('cursor_disconnect', function(data){
-                App.cursor(data.client_id).remove();
+                $(".cursor#" + data.client_id).remove();
             });
 
             $("#canvas").on("click", ".cursor", function(e){

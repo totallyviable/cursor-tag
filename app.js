@@ -27,10 +27,14 @@ io.on('connection', function (socket){
     socket.on('activate_webcam', function(data){
         active_clients[socket.id] = socket;
 
+        socket.paused = false;
+
         io.emit('player_count', Object.keys(active_clients).length);
     });
 
     socket.on('cursor_position', function(data){
+        if (socket.paused) return;
+
         socket.volatile.broadcast.emit('cursor_position', {
             client_id: socket.id,
             position: data
@@ -41,6 +45,8 @@ io.on('connection', function (socket){
         var victim_client = active_clients[data.victim_client_id];
 
         if (! victim_client) return;
+
+        if (victim_client.paused) return;
 
         victim_client.emit('request_webcam_frame', {
             victim_client_id: data.victim_client_id,
@@ -56,15 +62,23 @@ io.on('connection', function (socket){
         opponent_client.emit('receive_webcam_frame', data);
     });
 
+    socket.on('paused', function(data){
+        io.emit('cursor_disconnect', {
+            client_id: socket.id
+        });
+
+        if (active_clients[socket.id]) delete active_clients[socket.id];
+
+        socket.paused = true;
+    });
+
     socket.on('disconnect', function (){
         io.emit('cursor_disconnect', {
             client_id: socket.id
         });
 
-        if (active_clients[socket.id]) {
-            delete active_clients[socket.id];
+        if (active_clients[socket.id]) delete active_clients[socket.id];
 
-            io.emit('player_count', Object.keys(active_clients).length);
-        }
+        io.emit('player_count', Object.keys(active_clients).length);
     });
 });
