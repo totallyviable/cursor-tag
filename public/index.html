@@ -44,6 +44,10 @@
             color: #FF5685;
         }
 
+        .blue {
+            color: #6857FF;
+        }
+
         #stats {
             position: absolute;
             top: 0;
@@ -104,7 +108,7 @@
                 right: 0;
             }
 
-                .splash .contents #logo {
+                .splash .contents .logo {
                     font-size: 40px;
                     margin-bottom: 100px;
                 }
@@ -116,6 +120,13 @@
                     width: 75%;
                     font-style: italic;
                 }
+
+            .splash .copyright {
+                position: absolute;
+                bottom: 10px;
+                left: 0;
+                right: 0;
+            }
 
         #flash {
             position: fixed;
@@ -425,7 +436,7 @@
     </div>
     <div id="splash-desktop" class="splash">
         <div class="contents">
-            <div id="logo">Cursor Tag</div>
+            <div class="logo">Cursor Tag</div>
             <div class="copy">
                 <a href="#" id="enable_webcam" class="green">Start</a>
             </div>
@@ -437,10 +448,11 @@
                 Click on a players cursor to tag.
             </div>
         </div>
+        <div class="copyright red">&copy; MMXV Allan &amp; Jacob</div>
     </div>
     <div id="splash-mobile" class="splash" style="display:none;">
         <div class="contents">
-            <div id="logo">Cursor Tag</div>
+            <div class="logo">Cursor Tag</div>
             <div class="copy">
                 <a href="mailto:?body=http://cursortag.com" class="green">Email yourself a link</a>
             </div>
@@ -449,6 +461,7 @@
                 Phones don’t have cursors.
             </div>
         </div>
+        <div class="copyright red">&copy; MMXV Allan &amp; Jacob</div>
     </div>
     <div id="countdown" style="display:none;">
         <span>3</span>
