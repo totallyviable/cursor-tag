@@ -296,10 +296,10 @@
 
             App.init();
 
-            socket.on('player_count', function(data){
-                $("#player_count_number").text(data.count);
+            socket.on('player_count', function(count){
+                $("#player_count_number").text(count);
 
-                if (data.count == 1) {
+                if (count == 1) {
                     $("#player_count_plural").hide();
                 } else {
                     $("#player_count_plural").show();

@@ -13,17 +13,15 @@ app.use(express.static(__dirname + '/public'));
 
 var active_clients = {};
 
+setInterval(function(){
+    io.emit('player_count', Object.keys(active_clients).length);
+}, 1000);
+
 io.on('connection', function (socket){
     socket.on('activate_webcam', function(data){
         active_clients[socket.id] = socket;
 
-        socket.emit('player_count', {
-            count: Object.keys(active_clients).length
-        });
-
-        socket.broadcast.emit('player_count', {
-            count: Object.keys(active_clients).length
-        });
+        io.emit('player_count', Object.keys(active_clients).length);
     });
 
     socket.on('cursor_position', function(data){
@@ -60,9 +58,7 @@ io.on('connection', function (socket){
         if (active_clients[socket.id]) {
             delete active_clients[socket.id];
 
-            socket.broadcast.emit('player_count', {
-                count: Object.keys(active_clients).length
-            });
+            io.emit('player_count', Object.keys(active_clients).length);
         }
     });
 });
