@@ -384,8 +384,6 @@
                 var cutoff_time = Date.now() - 1200;
 
                 $(".cursor").each(function(){
-                    _log($(this).data('last-seen') - cutoff_time);
-
                     if ($(this).data('last-seen') < cutoff_time) {
                         $(this).remove();
                     }
