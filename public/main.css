@@ -108,7 +108,7 @@ a {
 
     .splash .contents {
         position: absolute;
-        top: 30%;
+        top: 27%;
         left: 0;
         right: 0;
     }
@@ -128,7 +128,7 @@ a {
 
     .splash .copyright {
         position: absolute;
-        bottom: 10px;
+        bottom: 30px;
         left: 0;
         right: 0;
     }
