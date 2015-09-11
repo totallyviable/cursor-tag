@@ -20,12 +20,12 @@ app.get('/about', function (req, res){
 });
 
 function count_stat(name, value){
-    return;
+    // return;
     return stathat.trackEZCount(process.env.STATHAT_KEY, "cursortag." + process.env.ENVIRONMENT + "." + name, value, function(status, json) {});
 }
 
 function value_stat(name, value){
-    return;
+    // return;
     return stathat.trackEZValue(process.env.STATHAT_KEY, "cursortag." + process.env.ENVIRONMENT + "." + name, value, function(status, json) {});
 }
 
