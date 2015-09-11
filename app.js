@@ -5,6 +5,7 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var stathat = require('stathat');
+var _ = require('underscore');
 
 server.listen(process.env.PORT);
 
@@ -32,6 +33,18 @@ setInterval(function(){
     io.emit('player_count', Object.keys(active_clients).length);
 }, 1000);
 
+setInterval(function(){
+    var positions = {};
+
+    _.each(active_clients, function(client, key){
+        if (! client.paused) {
+            positions[key] = client.current_position;
+        }
+    });
+
+    io.emit('player_positions', positions);
+}, 25);
+
 io.on('connection', function (socket){
     socket.on('activate_webcam', function(data){
         active_clients[socket.id] = socket;
@@ -46,12 +59,7 @@ io.on('connection', function (socket){
 
     socket.on('cursor_position', function(data){
         if (socket.paused) return;
-
-        socket.volatile.broadcast.emit('cursor_position', {
-            client_id: socket.id,
-            client_paused: socket.paused,
-            position: data
-        });
+        socket.current_position = data;
     });
 
     socket.on('cursor_click', function(data){
