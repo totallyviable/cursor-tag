@@ -191,7 +191,7 @@
                 // TODO: only emit if position changed
                 App.emit_mouse_position_interval = setInterval(function(){
                     socket.emit('cursor_position', local_mouse_position);
-                }, 15);
+                }, 50);
             }
 
             socket.on('cursor_position', function(data){
