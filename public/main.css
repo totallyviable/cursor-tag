@@ -143,6 +143,7 @@ a {
     opacity: 0.15;
 }
 
+#empty,
 #paused,
 #countdown {
     position: absolute;
@@ -153,6 +154,7 @@ a {
     background: rgba(0,0,0, 0.85);
 }
     
+    #empty,
     #paused span,
     #countdown span {
         position: absolute;

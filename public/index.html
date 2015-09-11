@@ -40,6 +40,8 @@
                 frame_reset: null,
                 emit_mouse_position_interval: null,
 
+                camera_enabled: false,
+
                 init: function(stream){
                     if (window.location.hostname.indexOf('local') === -1 && window.location.protocol === 'http:') {
                         window.location = window.location.href.replace('http:', 'https:');
@@ -105,6 +107,7 @@
 
                     $(window).blur(function(){
                         $("#paused").show();
+                        $("#empty").hide();
 
                         socket.emit('paused', true);
                     });
@@ -125,6 +128,8 @@
                             $("#countdown span").text('1');
 
                             window.setTimeout(function(){
+                                App.camera_enabled = true;
+
                                 App.play_sound('countdown-over');
                                 $("#countdown").hide();
                                 $("#canvas").removeClass("dimmed");
@@ -166,6 +171,12 @@
                     $("#player_count_plural").hide();
                 } else {
                     $("#player_count_plural").show();
+                }
+
+                if (App.camera_enabled && ! $("#paused").is(':visible') && count <= 1) {
+                    $("#empty").show();
+                } else {
+                    $("#empty").hide();
                 }
             });
 
@@ -323,6 +334,9 @@
     </div>
     <div id="paused" style="display:none;">
         <span>PAUSED</span>
+    </div>
+    <div id="empty" style="display:none;">
+        <span>No one else is here<br/>Invite some friends</span>
     </div>
     <div id="camera_permissions" class="splash" style="display:none;">
         <div id="camera_feed" class="contents"></div>
