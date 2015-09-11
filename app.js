@@ -20,10 +20,12 @@ app.get('/about', function (req, res){
 });
 
 function count_stat(name, value){
+    return;
     return stathat.trackEZCount(process.env.STATHAT_KEY, "cursortag." + process.env.ENVIRONMENT + "." + name, value, function(status, json) {});
 }
 
 function value_stat(name, value){
+    return;
     return stathat.trackEZValue(process.env.STATHAT_KEY, "cursortag." + process.env.ENVIRONMENT + "." + name, value, function(status, json) {});
 }
 
@@ -53,8 +55,8 @@ io.on('connection', function (socket){
 
         io.emit('player_count', Object.keys(active_clients).length);
 
-        // count_stat("activate_webcam", 1);
-        // value_stat("player_count", Object.keys(active_clients).length);
+        count_stat("activate_webcam", 1);
+        value_stat("player_count", Object.keys(active_clients).length);
     });
 
     socket.on('cursor_position', function(data){
@@ -82,7 +84,7 @@ io.on('connection', function (socket){
 
         opponent_client.emit('receive_webcam_frame', data);
 
-        // count_stat("webcam_frame", 1);
+        count_stat("webcam_frame", 1);
     });
 
     socket.on('paused', function(data){
@@ -104,6 +106,6 @@ io.on('connection', function (socket){
 
         io.emit('player_count', Object.keys(active_clients).length);
 
-        // value_stat("player_count", Object.keys(active_clients).length);
+        value_stat("player_count", Object.keys(active_clients).length);
     });
 });
